@@ -2,6 +2,7 @@ package pages
 
 import (
 	"database/sql"
+	"forum/database"
 	"forum/handlers"
 	"forum/structs"
 	"net/http"
@@ -19,7 +20,7 @@ func HomeHandler(db *sql.DB) http.HandlerFunc {
 
 		forPage := structs.ForPage{}
 		forPage.User = handlers.IsLoggedIn(r, db).User
-		forPage.Posts, _ = handlers.GetAllPosts(db, tagID, forPage.User)
+		forPage.Posts, _ = database.GetAllPosts(db, tagID, forPage.User)
 		forPage.Tags = structs.Tags
 		all := structs.Tag{
 			ID:   0,
