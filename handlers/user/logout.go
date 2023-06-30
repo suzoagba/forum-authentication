@@ -1,20 +1,17 @@
 package user
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 )
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("[LogoutHandler]")
-	deleteCookie(w, "forum-session", r)
+	deleteCookie(w, "forum-session")
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 // Delete session cookie
-func deleteCookie(w http.ResponseWriter, name string, r *http.Request) {
-	fmt.Println("[deleteCookie]")
+func deleteCookie(w http.ResponseWriter, name string) {
 	cookie := &http.Cookie{
 		Name:    name,
 		Value:   "",
@@ -22,8 +19,4 @@ func deleteCookie(w http.ResponseWriter, name string, r *http.Request) {
 	}
 
 	http.SetCookie(w, cookie)
-
-	for _, c := range r.Cookies() {
-		fmt.Println(c)
-	}
 }

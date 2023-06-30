@@ -2,7 +2,6 @@ package pages
 
 import (
 	"database/sql"
-	"fmt"
 	"forum/handlers"
 	"forum/structs"
 	"net/http"
@@ -20,7 +19,6 @@ func HomeHandler(db *sql.DB) http.HandlerFunc {
 
 		forPage := structs.ForPage{}
 		forPage.User = handlers.IsLoggedIn(r, db).User
-		fmt.Println("[HomeHandler] forpage.user:", forPage.User)
 		forPage.Posts, _ = handlers.GetAllPosts(db, tagID, forPage.User)
 		forPage.Tags = structs.Tags
 		all := structs.Tag{
