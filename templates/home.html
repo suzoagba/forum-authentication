@@ -11,6 +11,11 @@
             {{ end }}
         </ul>
     </div>
+    {{ if .User.LoggedIn }}
+    <br>
+    <a class="createPost" href="/createPost">Create a new post</a>
+    <br>
+    {{ end }}
     {{ range .Posts }}
     <div class="postPreview">
         <a href="/viewPost?id={{ .ID }}"><h3 class="postTitle">{{ .Title }}</h3></a>
@@ -22,7 +27,7 @@
     <p>There are no posts.</p>
     {{ end }}
     {{ if .User.LoggedIn }}
-    <a href="/createPost">Create a new post</a>
+    <a class="createPost" href="/createPost">Create a new post</a>
     {{ end }}
 </div>
 {{ end }}

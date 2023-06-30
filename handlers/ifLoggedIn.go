@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"fmt"
 	"forum/structs"
 	"net/http"
 )
@@ -11,15 +12,21 @@ type userInfo struct {
 }
 
 func IsLoggedIn(r *http.Request, db *sql.DB) userInfo {
+	fmt.Println("[IfLoggedIn]")
 	info := userInfo{}
 
 	cookie, err := r.Cookie("forum-session")
+	for _, c := range r.Cookies() {
+		fmt.Println(c)
+	}
 	if err != nil {
+		fmt.Println("[IfLoggedIn] cookie err", err.Error())
 		info.User.LoggedIn = false
 		// Session ID cookie not found
 		return info
 	}
 	sessionID := cookie.Value
+	fmt.Println("[IfLoggedIn] session id:", sessionID)
 	if sessionID == "" {
 		info.User.LoggedIn = false
 		return info
@@ -39,6 +46,8 @@ func IsLoggedIn(r *http.Request, db *sql.DB) userInfo {
 		return info
 	}
 
+	fmt.Println("[IfLoggedIn] id in database")
+
 	// Check if the session ID exists in the database
 	row = db.QueryRow("SELECT uuid FROM users WHERE username = ?;", username)
 	var uuid string
@@ -49,8 +58,13 @@ func IsLoggedIn(r *http.Request, db *sql.DB) userInfo {
 		return info
 	}
 
+	fmt.Println("[IfLoggedIn] uuid in database")
+
 	info.User.ID = uuid
 	info.User.Username = username
 	info.User.LoggedIn = true
+
+	fmt.Println("[IfLoggedIn] ifloggedin user info:", info.User)
+	fmt.Println("[IfLoggedIn] info:", info)
 	return info
 }

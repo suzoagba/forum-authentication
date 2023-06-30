@@ -48,4 +48,15 @@ type ForPage struct {
 	Posts    []Post
 	Tags     []Tag
 	Comments []Comment
+	OAuth    OAuth
+}
+
+type OAuth struct {
+	GoogleID string
+	GitHubID string
+}
+
+type OAuthUser struct {
+	email string
+	other string
 }

@@ -16,6 +16,8 @@ func RegisterHandler(db *sql.DB) http.HandlerFunc {
 		forPage := structs.ForPage{}
 		forPage.User = handlers.IsLoggedIn(r, db).User
 		forPage.Error.Error = false
+		forPage.OAuth.GoogleID = GoogleClientID
+		forPage.OAuth.GitHubID = GithubClientID
 		if r.Method == http.MethodGet {
 			if forPage.User.LoggedIn {
 				http.Redirect(w, r, "/", http.StatusFound)
@@ -46,7 +48,7 @@ func register(w http.ResponseWriter, r *http.Request, db *sql.DB, forPage struct
 	invalidInput := false // Checks if the credentials that user wrote are valid
 
 	// Check if the email or username is already taken
-	if rowExists("SELECT email from users WHERE email = ?", email, db) { // if the email exists
+	if RowExists("SELECT email from users WHERE email = ?", email, db) { // if the email exists
 		invalidInput = true
 		forPage.Error.Error = true
 		forPage.Error.Message = "Email already taken"
@@ -54,7 +56,7 @@ func register(w http.ResponseWriter, r *http.Request, db *sql.DB, forPage struct
 		forPage.Error.Field2 = username
 		handlers.RenderTemplates("register", forPage, w, r)
 		return
-	} else if rowExists("SELECT username from users WHERE username = ?", username, db) { // if the email exists
+	} else if RowExists("SELECT username from users WHERE username = ?", username, db) { // if the email exists
 		invalidInput = true
 		forPage.Error.Error = true
 		forPage.Error.Message = "Username already taken"
@@ -64,6 +66,10 @@ func register(w http.ResponseWriter, r *http.Request, db *sql.DB, forPage struct
 		return
 	}
 
+	DoRegister(w, r, db, invalidInput, email, username, password, true)
+}
+
+func DoRegister(w http.ResponseWriter, r *http.Request, db *sql.DB, invalidInput bool, email string, username string, password string, loginNeeded bool) {
 	// Encrypt the password using bcrypt
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -73,13 +79,19 @@ func register(w http.ResponseWriter, r *http.Request, db *sql.DB, forPage struct
 
 	if !invalidInput {
 		// Insert the user into the database
-		err = insertUser(email, username, string(hashedPassword), db)
+		err = InsertUser(email, username, string(hashedPassword), db)
 		if err != nil {
 			http.Error(w, "Failed to register user", http.StatusInternalServerError)
 			return
 		}
-
-		http.Redirect(w, r, "/login", http.StatusFound)
+		if loginNeeded {
+			http.Redirect(w, r, "/login", http.StatusFound)
+		} else {
+			forPage := structs.ForPage{}
+			forPage.Error.Error = false
+			fmt.Println("login after oauth")
+			DoLogin(w, r, db, username, forPage)
+		}
 	} else {
 		fmt.Println("- Registration failed!")
 		fmt.Fprintln(w, "Registration failed!")
@@ -87,7 +99,7 @@ func register(w http.ResponseWriter, r *http.Request, db *sql.DB, forPage struct
 }
 
 // Function to check if the email is already taken (example implementation)
-func rowExists(query string, value string, db *sql.DB) bool {
+func RowExists(query string, value string, db *sql.DB) bool {
 	row := db.QueryRow(query, value)
 	switch err := row.Scan(&value); err {
 	case sql.ErrNoRows:
@@ -100,7 +112,7 @@ func rowExists(query string, value string, db *sql.DB) bool {
 }
 
 // Function to insert the user into the database (example implementation)
-func insertUser(email, username, password string, db *sql.DB) error {
+func InsertUser(email, username, password string, db *sql.DB) error {
 	stmt, err := db.Prepare("INSERT INTO users (uuid, username, password, email) VALUES (?, ?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)

@@ -158,6 +158,10 @@ button {
     font-size: small !important;
 }
 
+.createPost {
+    float: right;
+}
+
 .errorMessage {
     color: red;
     font-weight: bold;
@@ -186,4 +190,13 @@ button {
 
 .postImage {
     max-height: 200px;
+}
+
+#registerByEmail, #loginByEmail, #loading {
+    display: none;
+}
+
+#registerOptions a {
+    border: 1px solid gray;
+    padding: 15px;
 }

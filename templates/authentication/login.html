@@ -5,7 +5,14 @@
     {{ if .Error.Error }}
     <p class="errorMessage">{{ .Error.Message }}</p>
     {{ end }}
-    <form action="/login" method="POST">
+    <h3>Choose your login method:</h3>
+    <ul id="registerOptions">
+      <li><a href="https://accounts.google.com/o/oauth2/auth?client_id={{ .OAuth.GoogleID }}&redirect_uri=http://localhost:8080/oauth/google&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email" onclick="toggleVisibility('loading')">Google</a></li>
+      <li><a href="https://github.com/login/oauth/authorize?client_id={{ .OAuth.GitHubID }}&redirect_uri=http://localhost:8080/oauth/github&scope=user:email" onclick="toggleVisibility('loading')">GitHub</a></li>
+      <li><a href="#" onclick="toggleVisibility('loginByEmail')">Email</a></li>
+    </ul>
+    <h3 id="loading">OAuth loading...</h3>
+    <form id="loginByEmail" action="/login" method="POST">
       <label for="username">Username:</label>
       <br>
       <input type="text" id="username" name="username" placeholder="Username" autocomplete="username"{{ if .Error.Error }} value="{{ .Error.Field1 }}"{{ end }} required>

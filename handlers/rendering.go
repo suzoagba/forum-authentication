@@ -8,6 +8,7 @@ import (
 )
 
 func RenderTemplates(page string, data interface{}, w http.ResponseWriter, r *http.Request) {
+	fmt.Println("rendering:", r.URL.Path)
 	defer func() {
 		if err := recover(); err != nil {
 			log.Println("PANIC:", err)

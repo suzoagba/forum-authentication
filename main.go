@@ -40,6 +40,7 @@ func main() {
 	http.HandleFunc("/register", user.RegisterHandler(db))
 	http.HandleFunc("/login", user.LoginHandler(db))
 	http.HandleFunc("/logout", user.LogoutHandler)
+	http.HandleFunc("/oauth/", user.OauthHandler(db))
 
 	// Handling assets
 	fs := http.FileServer(http.Dir("./assets"))

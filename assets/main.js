@@ -29,3 +29,12 @@ window.addEventListener('load', function () {
         element.textContent = convertDateTime(isoDateTime);
     });
 });
+
+function toggleVisibility(id) {
+    const registerForm = document.getElementById(id);
+    if (registerForm.style.display !== 'block') {
+        registerForm.style.display = 'block';
+    } else {
+        registerForm.style.display = 'none';
+    }
+}
