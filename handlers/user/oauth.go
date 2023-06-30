@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"forum/handlers"
+	"forum/oauth"
 	"forum/structs"
 	"github.com/google/uuid"
 	"io"
@@ -15,12 +16,12 @@ import (
 )
 
 var (
-	GoogleClientID     = ""
-	GoogleClientSecret = ""
-	GoogleRedirectURI  = "http://localhost:8080/oauth/google"
-	GithubClientID     = ""
-	GithubClientSecret = ""
-	GithubRedirectURI  = "http://localhost:8080/oauth/github"
+	GoogleClientID     = oauth.GoogleClientID
+	GoogleClientSecret = oauth.GoogleClientSecret
+	GoogleRedirectURI  = oauth.GoogleRedirectURI
+	GithubClientID     = oauth.GithubClientID
+	GithubClientSecret = oauth.GithubClientSecret
+	GithubRedirectURI  = oauth.GithubRedirectURI
 )
 
 // OauthHandler handles the OAuth callback request
