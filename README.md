@@ -78,7 +78,10 @@ Redirect URI-s are:
 - Google: `http://localhost:8080/oauth/google`
 - GitHub: `http://localhost:8080/oauth/github`
 
-Input your `client ID`-s and `secrets` to `oauth/clientInfo.go` and remove the commenting.
+Input your `client ID`-s and `secrets` to `oauth/clientInfo.go`.
+
+If you log in via Google or GitHub and a user is already registered by the same email, the previously registered
+username will be used. Otherwise, the username will be based on your email.
 
 ### Docker
 

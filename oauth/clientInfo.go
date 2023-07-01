@@ -1,6 +1,6 @@
 package oauth
 
-/*const (
+const (
 	GoogleClientID     = ""
 	GoogleClientSecret = ""
 	GoogleRedirectURI  = "http://localhost:8080/oauth/google"
@@ -8,4 +8,3 @@ package oauth
 	GithubClientSecret = ""
 	GithubRedirectURI  = "http://localhost:8080/oauth/github"
 )
-*/

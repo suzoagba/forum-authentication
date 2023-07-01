@@ -7,8 +7,20 @@
     {{ end }}
     <h3>Choose your register method:</h3>
     <ul id="registerOptions">
-      <li><a href="https://accounts.google.com/o/oauth2/auth?client_id={{ .OAuth.GoogleID }}&redirect_uri=http://localhost:8080/oauth/google&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email" onclick="toggleVisibility('loading')">Google</a></li>
-      <li><a href="https://github.com/login/oauth/authorize?client_id={{ .OAuth.GitHubID }}&redirect_uri=http://localhost:8080/oauth/github&scope=user:email" onclick="toggleVisibility('loading')">GitHub</a></li>
+      <li>
+        {{ if eq .OAuth.GoogleID "" }}
+        Google
+        {{ else }}
+        <a href="https://accounts.google.com/o/oauth2/auth?client_id={{ .OAuth.GoogleID }}&redirect_uri=http://localhost:8080/oauth/google&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email" onclick="toggleVisibility('loading')">Google</a>
+        {{ end }}
+      </li>
+      <li>
+        {{ if eq .OAuth.GoogleID "" }}
+        GitHub
+        {{ else }}
+        <a href="https://github.com/login/oauth/authorize?client_id={{ .OAuth.GitHubID }}&redirect_uri=http://localhost:8080/oauth/github&scope=user:email" onclick="toggleVisibility('loading')">GitHub</a>
+        {{ end }}
+      </li>
       <li><a href="#" onclick="toggleVisibility('registerByEmail')">Email</a></li>
     </ul>
     <h3 id="loading">OAuth loading...</h3>

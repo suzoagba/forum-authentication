@@ -1,14 +1,12 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"text/template"
 )
 
 func RenderTemplates(page string, data interface{}, w http.ResponseWriter, r *http.Request) {
-	fmt.Println("rendering:", r.URL.Path)
 	defer func() {
 		if err := recover(); err != nil {
 			log.Println("PANIC:", err)
@@ -19,7 +17,7 @@ func RenderTemplates(page string, data interface{}, w http.ResponseWriter, r *ht
 		ErrorHandler(w, http.StatusBadRequest, "")
 		return
 	}
-	fmt.Println("#PAGE: " + page)
+	log.Println("#PAGE: " + page)
 
 	link := "./templates/"
 	switch page {
