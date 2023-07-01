@@ -66,6 +66,20 @@ In this project JPG, JPEG, PNG and GIF types are handled.
 The max size of the images to load is 20 mb. If there is an attempt to load an image greater than 20 mb, 
 an error message will the user that the image is too big.
 
+### Authentication
+
+The goal of this project was to implement new ways of authentication. You are able to register and to login 
+using Google and GitHub authentication tools.
+
+To use the new ways of authentication, register an OAuth app at 
+[Google](https://developers.google.com/identity/protocols/oauth2/web-server) and 
+[GitHub](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app).
+Redirect URI-s are:
+- Google: `http://localhost:8080/oauth/google`
+- GitHub: `http://localhost:8080/oauth/github`
+
+Input your `client ID`-s and `secrets` to `oauth/clientInfo.go` and remove the commenting.
+
 ### Docker
 
 For the forum project Docker is used.
@@ -90,7 +104,7 @@ No frontend libraries or frameworks like React, Angular, Vue etc. have been used
 
 ### Audit
 
-Questions can be found [here](https://github.com/01-edu/public/tree/master/subjects/forum/audit).
+Questions can be found [here](https://github.com/01-edu/public/blob/master/subjects/forum/advanced-features/audit.md).
 
 ## Developers
 - Willem Kuningas / *thinkpad*
