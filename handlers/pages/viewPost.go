@@ -20,7 +20,7 @@ func ViewPostHandler(db *sql.DB) http.HandlerFunc {
 		if react != "" {
 			if react == "0" {
 				// Check if the user has already liked/disliked the post
-				reactionExists, err := checkReactionExists(db, postID, r, true)
+				reactionExists, wasLike, err := checkReactionExists(db, postID, r, true)
 				if err != nil {
 					http.Error(w, "Failed to check reaction existence", http.StatusInternalServerError)
 					return
@@ -53,6 +53,57 @@ func ViewPostHandler(db *sql.DB) http.HandlerFunc {
 						http.Error(w, "Failed to store reaction", http.StatusInternalServerError)
 						return
 					}
+				} else {
+					// Update the like and dislike count for the post
+					updatePostQuery := "UPDATE posts SET likes = likes + ?, dislikes = dislikes + ? WHERE postID = ?"
+					var (
+						likeIncrement    int
+						dislikeIncrement int
+					)
+
+					if (like == "true" && !wasLike) || (like == "false" && wasLike) {
+						if like == "true" && !wasLike {
+							likeIncrement = 1
+							dislikeIncrement = -1
+						} else if like == "false" && wasLike {
+							likeIncrement = -1
+							dislikeIncrement = 1
+						}
+
+						user := handlers.IsLoggedIn(r, db).User
+
+						// Update the reaction_type to false for the specified post and user
+						updateQuery := "UPDATE post_reactions SET reaction_type = ? WHERE post_id = ? AND user_id = ?"
+						_, err = db.Exec(updateQuery, like == "true", postID, user.ID)
+						if err != nil {
+							http.Error(w, "Failed to update reaction", http.StatusInternalServerError)
+							return
+						}
+					} else {
+						if like == "true" {
+							likeIncrement = -1
+							dislikeIncrement = 0
+						} else {
+							likeIncrement = 0
+							dislikeIncrement = -1
+						}
+
+						user := handlers.IsLoggedIn(r, db).User
+
+						// Delete the row from post_reactions table for the specified post and user
+						deleteQuery := "DELETE FROM post_reactions WHERE post_id = ? AND user_id = ?"
+						_, err := db.Exec(deleteQuery, postID, user.ID)
+						if err != nil {
+							http.Error(w, "Failed to delete reaction", http.StatusInternalServerError)
+							return
+						}
+					}
+
+					_, err := db.Exec(updatePostQuery, likeIncrement, dislikeIncrement, postID)
+					if err != nil {
+						http.Error(w, "Failed to update post", http.StatusInternalServerError)
+						return
+					}
 				}
 			} else {
 				// It's a reaction to a comment
@@ -64,7 +115,7 @@ func ViewPostHandler(db *sql.DB) http.HandlerFunc {
 				}
 
 				// Check if the user has already liked/disliked the comment
-				reactionExists, err := checkReactionExists(db, strconv.Itoa(commentID), r, false)
+				reactionExists, wasLike, err := checkReactionExists(db, strconv.Itoa(commentID), r, false)
 				if err != nil {
 					http.Error(w, "Failed to check reaction existence", http.StatusInternalServerError)
 					return
@@ -95,6 +146,57 @@ func ViewPostHandler(db *sql.DB) http.HandlerFunc {
 					err = storeCommentReaction(db, commentID, user.ID, like == "true")
 					if err != nil {
 						http.Error(w, "Failed to store reaction", http.StatusInternalServerError)
+						return
+					}
+				} else {
+					// Update the like and dislike count for the post
+					updateCommentQuery := "UPDATE comments SET likes = likes + ?, dislikes = dislikes + ? WHERE commentID = ?"
+					var (
+						likeIncrement    int
+						dislikeIncrement int
+					)
+
+					if (like == "true" && !wasLike) || (like == "false" && wasLike) {
+						if like == "true" && !wasLike {
+							likeIncrement = 1
+							dislikeIncrement = -1
+						} else if like == "false" && wasLike {
+							likeIncrement = -1
+							dislikeIncrement = 1
+						}
+
+						user := handlers.IsLoggedIn(r, db).User
+
+						// Update the reaction_type to false for the specified post and user
+						updateQuery := "UPDATE comment_reactions SET reaction_type = ? WHERE comment_id = ? AND user_id = ?"
+						_, err = db.Exec(updateQuery, like == "true", commentID, user.ID)
+						if err != nil {
+							http.Error(w, "Failed to update reaction", http.StatusInternalServerError)
+							return
+						}
+					} else {
+						if like == "true" {
+							likeIncrement = -1
+							dislikeIncrement = 0
+						} else {
+							likeIncrement = 0
+							dislikeIncrement = -1
+						}
+
+						user := handlers.IsLoggedIn(r, db).User
+
+						// Delete the row from comment_reactions table for the specified comment and user
+						deleteQuery := "DELETE FROM comment_reactions WHERE comment_id = ? AND user_id = ?"
+						_, err := db.Exec(deleteQuery, commentID, user.ID)
+						if err != nil {
+							http.Error(w, "Failed to delete reaction", http.StatusInternalServerError)
+							return
+						}
+					}
+
+					_, err := db.Exec(updateCommentQuery, likeIncrement, dislikeIncrement, commentID)
+					if err != nil {
+						http.Error(w, "Failed to update post", http.StatusInternalServerError)
 						return
 					}
 				}
@@ -171,7 +273,7 @@ func ViewPostHandler(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-func checkReactionExists(db *sql.DB, reactionID string, r *http.Request, isPost bool) (bool, error) {
+func checkReactionExists(db *sql.DB, reactionID string, r *http.Request, isPost bool) (bool, bool, error) {
 	user := handlers.IsLoggedIn(r, db).User
 
 	// Determine the table name and column names based on whether it's a post or comment reaction
@@ -185,19 +287,24 @@ func checkReactionExists(db *sql.DB, reactionID string, r *http.Request, isPost 
 
 	// Query the database to check if the user has already reacted to the post or comment
 	query := fmt.Sprintf(
-		"SELECT EXISTS (SELECT 1 FROM %s WHERE %s = ? AND %s = ?)",
-		tableName, idColumnName, userIDColumnName,
+		"SELECT EXISTS (SELECT 1 FROM %s WHERE %s = ? AND %s = ?), reaction_type FROM %s WHERE %s = ? AND %s = ?",
+		tableName, idColumnName, userIDColumnName, tableName, idColumnName, userIDColumnName,
 	)
 
-	row := db.QueryRow(query, reactionID, user.ID)
+	row := db.QueryRow(query, reactionID, user.ID, reactionID, user.ID)
 
 	var exists bool
-	err := row.Scan(&exists)
+	var reactionType bool
+	err := row.Scan(&exists, &reactionType)
 	if err != nil {
-		return false, err
+		if err == sql.ErrNoRows {
+			// No rows found, indicating the reaction doesn't exist
+			return false, false, nil
+		}
+		return false, false, err
 	}
 
-	return exists, nil
+	return exists, reactionType, nil
 }
 
 func storePostReaction(db *sql.DB, postID string, userUUID string, reactionType bool) error {
