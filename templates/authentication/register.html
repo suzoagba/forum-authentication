@@ -5,7 +5,7 @@
     {{ if .Error.Error }}
     <p class="errorMessage">{{ .Error.Message }}</p>
     {{ end }}
-    <h3>Choose your register method:</h3>
+    <h3>Please select your registration method:</h3>
     <ul id="registerOptions">
       <li>
         {{ if eq .OAuth.GoogleID "" }}

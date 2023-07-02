@@ -13,7 +13,7 @@ type userInfo struct {
 func IsLoggedIn(r *http.Request, db *sql.DB) userInfo {
 	info := userInfo{}
 
-	cookie, err := r.Cookie("forum-session")
+	cookie, err := r.Cookie("Forum-session")
 	if err != nil {
 		info.User.LoggedIn = false
 		// Session ID cookie not found

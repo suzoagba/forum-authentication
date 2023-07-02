@@ -6,7 +6,7 @@ import (
 )
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	deleteCookie(w, "forum-session")
+	deleteCookie(w, "Forum-session")
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 

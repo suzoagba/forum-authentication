@@ -81,7 +81,7 @@ func passwordCorrect(query string, value string, password string, db *sql.DB) bo
 func DoLogin(w http.ResponseWriter, r *http.Request, db *sql.DB, username string, forPage structs.ForPage) {
 	sessionID := uuid.New().String()
 	expiration := time.Now().Add(24 * time.Hour) // Set the expiration time for the cookie
-	createCookie(w, "forum-session", sessionID, expiration)
+	createCookie(w, "Forum-session", sessionID, expiration)
 	err := updateSessionID(username, sessionID, db)
 	if err != nil {
 		forPage.Error.Error = true

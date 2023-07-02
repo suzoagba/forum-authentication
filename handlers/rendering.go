@@ -17,7 +17,7 @@ func RenderTemplates(page string, data interface{}, w http.ResponseWriter, r *ht
 		ErrorHandler(w, http.StatusBadRequest, "")
 		return
 	}
-	log.Println("#PAGE: " + page)
+	// log.Println("#PAGE: " + page)
 
 	link := "./templates/"
 	switch page {

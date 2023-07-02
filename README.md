@@ -111,3 +111,4 @@ Questions can be found [here](https://github.com/01-edu/public/blob/master/subje
 
 ## Developers
 - Willem Kuningas / *thinkpad*
+- Samuel Uzoagba / *suzoagba*

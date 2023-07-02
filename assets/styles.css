@@ -14,7 +14,10 @@ body {
 
 .navBar {
     border-bottom: 2px solid cyan;
-    display: block;
+    display: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
     width: 100%;
     background-color: #3f393a;
     color: white;
