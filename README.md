@@ -107,7 +107,7 @@ No frontend libraries or frameworks like React, Angular, Vue etc. have been used
 
 ### Audit
 
-Questions can be found [here](https://github.com/01-edu/public/blob/master/subjects/forum/advanced-features/audit.md).
+Questions can be found [here] https://github.com/01-edu/public/blob/master/subjects/forum/authentication/audit.md.
 
 ## Developers
 - Willem Kuningas / *thinkpad*
